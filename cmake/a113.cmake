@@ -3,7 +3,7 @@ set(CMAKE_SYSTEM_PROCESSOR aarch64)
 # set(CMAKE_STAGING_PREFIX "${CMAKE_BINARY_DIR}/apollo")
 
 set(TRIPLE "aarch64-ca53v2-linux-gnueabi")
-# set(TRIPLE_UNKNOWN "aarch64-unknown-linux-gnueabi")
+set(TRIPLE_UNKNOWN "aarch64-unknown-linux-gnueabi")
 
 set(CMAKE_SYSROOT /usr/local/toolchain/${TRIPLE}/${TRIPLE}/sysroot)
 

@@ -3,7 +3,8 @@ set(CMAKE_SYSTEM_PROCESSOR powerpc)
 # set(CMAKE_STAGING_PREFIX "${CMAKE_BINARY_DIR}/apollo")
 
 set(TRIPLE "powerpc-fenwayV3-linux-gnu")
-# set(TRIPLE_UNKNOWN "powerpc-unknown-linux-gnueabi")
+set(TRIPLE_UNKNOWN "powerpc-unknown-linux-gnueabi")
+
 set(CMAKE_SYSROOT /usr/local/toolchain/${TRIPLE}/${TRIPLE}/sysroot)
 
 set(CMAKE_C_COMPILER ${TRIPLE}-gcc)

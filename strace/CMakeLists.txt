@@ -3,14 +3,16 @@ project(strace C)
 
 # to build:
 #   mkdir a113
+#   cd a113
 #   cmake -DCMAKE_TOOLCHAIN_FILE=[path to]/cmake/a113.cmake [path to CMakeLists.txt]
 #   make install
-# installable binaries in
-#   a113/strace/a113/strace-build/install
+
+# to install
+#   cp -R ./install <path to /jffs/mnt>/a113
 
 include(ExternalProject)
 
-set(PREFIX "${CMAKE_BINARY_DIR}/strace-build/install")
+set(PREFIX "${CMAKE_BINARY_DIR}/install")
 
 ExternalProject_Add(
     strace
