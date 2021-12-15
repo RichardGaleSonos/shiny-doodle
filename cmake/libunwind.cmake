@@ -22,7 +22,15 @@ if (NOT LIBUNWIND_FOUND)
         URL
             http://download.savannah.nongnu.org/releases/libunwind/libunwind-${LIBUNWIND_VERSION}.tar.gz
         CONFIGURE_COMMAND
-            ${CMAKE_BINARY_DIR}/libunwind-prefix/src/libunwind/configure --prefix=${PREFIX} --build=${CMAKE_HOST_SYSTEM_PROCESSOR}-pc-linux-gnu --host=${TRIPLE} --with-sysroot=${CMAKE_SYSROOT} CC=${CMAKE_C_COMPILER} LD=${CMAKE_LINKER} CFLAGS=${EXTRA_CFLAGS} LDFLAGS=${EXTRA_LDFLAGS}
+            ${CMAKE_BINARY_DIR}/libunwind-prefix/src/libunwind/configure
+                --prefix=${PREFIX}
+                --build=${CMAKE_HOST_SYSTEM_PROCESSOR}-pc-linux-gnu
+                --host=${TRIPLE}
+                --with-sysroot=${CMAKE_SYSROOT}
+                CC=${CMAKE_C_COMPILER}
+                LD=${CMAKE_LINKER}
+                CFLAGS=${EXTRA_CFLAGS}
+                LDFLAGS=${EXTRA_LDFLAGS}
         BUILD_COMMAND
             make
         INSTALL_COMMAND

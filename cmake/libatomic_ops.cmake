@@ -16,7 +16,16 @@ if (NOT LIBATOMIC_OPS_FOUND)
         URL
             https://github.com/ivmai/libatomic_ops/releases/download/v${LIBATOMIC_OPS_VERSION}/libatomic_ops-${LIBATOMIC_OPS_VERSION}.tar.gz
         CONFIGURE_COMMAND
-            ${CMAKE_BINARY_DIR}/libatomic_ops-prefix/src/libatomic_ops/configure --prefix=${PREFIX} --build=${CMAKE_HOST_SYSTEM_PROCESSOR}-pc-linux-gnu --host=${TRIPLE} --with-sysroot=${CMAKE_SYSROOT} CC=${CMAKE_C_COMPILER} LD=${CMAKE_LINKER} CFLAGS=${EXTRA_CFLAGS} LDFLAGS=${EXTRA_LDFLAGS} --enable-debug-frame
+            ${CMAKE_BINARY_DIR}/libatomic_ops-prefix/src/libatomic_ops/configure
+                --enable-debug-frame
+                --prefix=${PREFIX}
+                --build=${CMAKE_HOST_SYSTEM_PROCESSOR}-pc-linux-gnu
+                --host=${TRIPLE}
+                --with-sysroot=${CMAKE_SYSROOT}
+                CC=${CMAKE_C_COMPILER}
+                LD=${CMAKE_LINKER}
+                CFLAGS=${EXTRA_CFLAGS}
+                LDFLAGS=${EXTRA_LDFLAGS}
         BUILD_COMMAND
             make
         INSTALL_COMMAND
