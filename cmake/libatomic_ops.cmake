@@ -17,7 +17,7 @@ if (NOT LIBATOMIC_OPS_FOUND)
             https://github.com/ivmai/libatomic_ops/releases/download/v${LIBATOMIC_OPS_VERSION}/libatomic_ops-${LIBATOMIC_OPS_VERSION}.tar.gz
         CONFIGURE_COMMAND
             ${CMAKE_BINARY_DIR}/libatomic_ops-prefix/src/libatomic_ops/configure
-                --enable-debug-frame
+                # --enable-debug-frame
                 --prefix=${PREFIX}
                 --build=${CMAKE_HOST_SYSTEM_PROCESSOR}-pc-linux-gnu
                 --host=${TRIPLE}

@@ -1,3 +1,5 @@
+# TODO:REG add qa checks from insane.bbclass
+
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR aarch64)
 # set(CMAKE_STAGING_PREFIX "${CMAKE_BINARY_DIR}/apollo")

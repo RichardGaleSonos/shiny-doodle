@@ -14,13 +14,13 @@ if (NOT LIBUNWIND_FOUND)
     set(EXTRA_CFLAGS "-I${CMAKE_SYSROOT} -I${LZMA_INCLUDE_DIRS} -I${LIBATOMIC_OPS_INCLUDE_DIRS}")
     set(EXTRA_LDFLAGS "-L${LZMA_LIBRARIES} -llzma -L${LIBATOMIC_OPS_LIBRARIES} -latomic_ops")
 
-    # set(LIBUNWIND_VERSION "1.6.2")
-    set(LIBUNWIND_VERSION "1.3.1") # version in yocto+patches
+    # set(LIBUNWIND_VERSION_STRING "1.6.2")
+    set(LIBUNWIND_VERSION_STRING "1.3.1") # version in yocto+patches
 
     ExternalProject_Add(
         libunwind
         URL
-            http://download.savannah.nongnu.org/releases/libunwind/libunwind-${LIBUNWIND_VERSION}.tar.gz
+            http://download.savannah.nongnu.org/releases/libunwind/libunwind-${LIBUNWIND_VERSION_STRING}.tar.gz
         CONFIGURE_COMMAND
             ${CMAKE_BINARY_DIR}/libunwind-prefix/src/libunwind/configure
                 --prefix=${PREFIX}
@@ -39,8 +39,20 @@ if (NOT LIBUNWIND_FOUND)
             libatomic_ops xz
     )
 
+    set(LIBUNWIND_FOUND TRUE)
     set(LIBUNWIND_INCLUDE_DIRS "${PREFIX}/include")
     set(LIBUNWIND_LIBRARIES "${PREFIX}/lib")
+
     set(LIBUNWIND_DIR "${PREFIX}")
-    set(LIBUNWIND_FOUND TRUE)
+    set(LIBUNWIND_HAS_UNW_GETCONTEXT TRUE)
+    set(LIBUNWIND_HAS_UNW_INIT_LOCAL TRUE)
+    set(LIBUNWIND_HAS_UNW_BACKTRACE TRUE)
+    set(LIBUNWIND_HAS_UNW_BACKTRACE_SKIP TRUE)
+
+    set(LIBUNWIND_INCLUDE_DIR "${PREFIX}/include")
+    set(LIBUNWIND_LIBRARY libunwind)
+
+    file(WRITE ${LIBUNWIND_INCLUDE_DIR}/unwind.h "")
 endif()
+
+mark_as_advanced( LIBUNWIND_INCLUDE_DIR LIBUNWIND_LIBRARY )
