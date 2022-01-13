@@ -14,10 +14,12 @@
 cmake_minimum_required(VERSION 3.14)
 project(perf C)
 
+# requirements
+#   sudo apt install cmake
 # to build:
 #   mkdir a113
 #   cd a113
-#   cmake -DCMAKE_TOOLCHAIN_FILE=[path to]/cmake/a113.cmake [path to CMakeLists.txt]
+#   cmake -DCMAKE_TOOLCHAIN_FILE=[path to]/cmake/a113.cmake -DCMAKE_MAKE_PROGRAM=/usr/bin/make [path to CMakeLists.txt]
 #   make install
 
 # to install
@@ -65,7 +67,7 @@ ExternalProject_Add(
             CC=${CMAKE_C_COMPILER}
             CCLD=${CMAKE_C_COMPILER}
             LDSHARED=${CMAKE_C_COMPILER}
-            AR=${CMAKE_AR}
+            AR=${CMAKE_AR} 
             LD=${CMAKE_LINKER}
             CFLAGS=${EXTRA_CFLAGS}
             LDFLAGS=${EXTRA_LDFLAGS}
@@ -96,6 +98,29 @@ ExternalProject_Add(
             prefix=${PREFIX}
             install
     DEPENDS elfutils xz zlib bzip2 openssl libunwind libatomic_ops
+)
+
+add_custom_target(perfsrc
+    COMMAND
+        make
+        -C ${CMAKE_SOURCE_DIR}/linux-4.9.99/tools/perf
+        V=1
+        VF=1
+        O=${CMAKE_BINARY_DIR}/perf-prefix/out
+        CROSS_COMPILE=${TRIPLE}-
+        ARCH=arm64
+        CC=${CMAKE_C_COMPILER}
+        CCLD=${CMAKE_C_COMPILER}
+        LDSHARED=${CMAKE_C_COMPILER}
+        AR=${CMAKE_AR} 
+        LD=${CMAKE_LINKER}
+        CFLAGS=${EXTRA_CFLAGS}
+        LDFLAGS=${EXTRA_LDFLAGS}
+        EXTRA_CFLAGS=${EXTRA_CFLAGS}
+        EXTRA_LDFLAGS=${EXTRA_LDFLAGS}
+        LIBUNWIND_DIR=${LIBUNWIND_DIR}
+        LIBDW_DIR=${LIBDW_DIR}
+        prefix=${PREFIX}
 )
 
 install(

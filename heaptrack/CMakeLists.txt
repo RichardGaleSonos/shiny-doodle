@@ -4,12 +4,18 @@ project(heaptrack C)
 # to build:
 #   mkdir a113
 #   cd a113
-#   cmake -DCMAKE_TOOLCHAIN_FILE=[path to]/cmake/a113.cmake [path to CMakeLists.txt]
+#   cmake -DCMAKE_TOOLCHAIN_FILE=[path to]/cmake/a113.cmake -DCMAKE_MAKE_PROGRAM=/usr/bin/make [path to CMakeLists.txt]
 #   make install
 
 # to install
 #   cp -R ./heaptrack-build/install/ <path to /jffs/mnt>/a113
 #   cp -R ./heaptrack-build/install/* /home/richardgale/git/pdsw-sonos-controller-player-s2/a113/
+
+# sudo apt install heaptrack-gui
+
+# heaptrack
+# heaptrackfix
+# heaptrack_gui
 
 include(ExternalProject)
 

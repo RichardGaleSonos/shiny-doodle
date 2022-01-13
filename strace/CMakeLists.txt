@@ -4,7 +4,7 @@ project(strace C)
 # to build:
 #   mkdir a113
 #   cd a113
-#   cmake -DCMAKE_TOOLCHAIN_FILE=[path to]/cmake/a113.cmake [path to CMakeLists.txt]
+#   cmake -DCMAKE_TOOLCHAIN_FILE=[path to]/cmake/a113.cmake -DCMAKE_MAKE_PROGRAM=/usr/bin/make [path to CMakeLists.txt]
 #   make install
 
 # to install
@@ -32,7 +32,7 @@ ExternalProject_Add(
 install(
     FILES
         ${CMAKE_SYSROOT}/lib/librt.so.1
-        ${CMAKE_SYSROOT}/lib/librt-2.23.so
+        ${CMAKE_SYSROOT}/lib/librt-2.25.so
     DESTINATION
-        ${PREFIX}/bin
+        ${PREFIX}/lib
 )
