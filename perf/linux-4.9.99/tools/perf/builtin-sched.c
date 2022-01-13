@@ -1514,6 +1514,83 @@ out:
 	return 0;
 }
 
+static int chrometracing_switch_event(struct perf_sched *sched, struct perf_evsel *evsel,
+			    struct perf_sample *sample, struct machine *machine)
+{
+	const u32 next_pid = perf_evsel__intval(evsel, sample, "next_pid");
+	struct thread *sched_in;
+	int new_shortname;
+	u64 timestamp0, timestamp = sample->time;
+	s64 delta;
+	int i, this_cpu = sample->cpu;
+	int cpus_nr;
+	bool new_cpu = false;
+	const char *color = PERF_COLOR_NORMAL;
+
+	struct thread *th;
+	struct thread *oth;
+
+	BUG_ON(this_cpu >= MAX_CPUS || this_cpu < 0);
+
+	if (this_cpu > sched->max_cpu)
+		sched->max_cpu = this_cpu;
+
+	if (sched->map.comp) {
+		cpus_nr = bitmap_weight(sched->map.comp_cpus_mask, MAX_CPUS);
+		if (!test_and_set_bit(this_cpu, sched->map.comp_cpus_mask)) {
+			sched->map.comp_cpus[cpus_nr++] = this_cpu;
+			new_cpu = true;
+		}
+	} else
+		cpus_nr = sched->max_cpu;
+
+	timestamp0 = sched->cpu_last_switched[this_cpu];
+	sched->cpu_last_switched[this_cpu] = timestamp;
+	if (timestamp0)
+		delta = timestamp - timestamp0;
+	else
+		delta = 0;
+
+	if (delta < 0) {
+		pr_err("hm, delta: %" PRIu64 " < 0 ?\n", delta);
+		return -1;
+	}
+
+	sched_in = map__findnew_thread(sched, machine, -1, next_pid);
+	if (sched_in == NULL)
+		return -1;
+
+	th = thread__get(sched_in);
+	oth = sched->curr_thread[this_cpu];
+	if (oth != th) {
+		if (oth) {
+			if (strcmp(thread__comm_str(oth), "swapper")) {
+				printf("{\n");
+				printf("    \"ph\": \"E\",\n");
+				printf("    \"pid\": %u,\n", this_cpu + 1);
+				printf("    \"tid\": %u,\n", this_cpu + 1);
+				printf("    \"ts\": %12.6f\n", (double)timestamp / 1000);
+				printf("},\n");
+			}
+		}
+
+		if (strcmp(thread__comm_str(th), "swapper")) {
+			printf("{\n");
+			printf("    \"name\": \"%s [%d]\",\n", thread__comm_str(th), next_pid);
+			printf("    \"cat\": \"sched\",\n");
+			printf("    \"ph\": \"B\",\n");
+			printf("    \"pid\": %u,\n", this_cpu + 1);
+			printf("    \"tid\": %u,\n", this_cpu + 1);
+			printf("    \"ts\": %12.6f\n", (double)timestamp / 1000);
+			printf("},\n");
+		}
+	}
+	sched->curr_thread[this_cpu] = th;
+	thread__put(sched_in);
+
+	return 0;
+}
+
 static int process_sched_switch_event(struct perf_tool *tool,
 				      struct perf_evsel *evsel,
 				      struct perf_sample *sample,
@@ -1841,6 +1918,62 @@ static int perf_sched__map(struct perf_sched *sched)
 	return 0;
 }
 
+static int perf_sched__chrometracing(struct perf_sched *sched)
+{
+	int i;
+	bool first;
+
+	if (setup_map_cpus(sched))
+		return -1;
+
+	if (setup_color_pids(sched))
+		return -1;
+
+	if (setup_color_cpus(sched))
+		return -1;
+
+	setup_pager();
+
+	printf("{\n");
+	printf("    \"displayTimeUnit\": \"ns\",\n");
+    printf("    \"systemTraceEvents\": \"SystemTraceData\",\n");
+    printf("    \"otherData\": {\n");
+    printf("        \"version\": \"My Application v1.0\"\n");
+    printf("    },\n");
+
+	printf("    \"traceEvents\": [\n");
+
+	if (perf_sched__read_events(sched)) {
+		printf("    ]}\n");
+		return -1;
+	}
+	
+	first = true;
+	for (i = 0; i < sched->max_cpu; i++) {
+		int cpu = sched->map.comp ? sched->map.comp_cpus[i] : i;
+		struct thread *curr_thread = sched->curr_thread[cpu];
+		if (curr_thread) {
+			if (!first) {
+				printf(",\n");
+			}
+			printf("{\n");
+			printf("    \"ph\": \"E\",\n");
+			printf("    \"pid\": %u,\n", cpu + 1);
+			printf("    \"tid\": %u,\n", cpu + 1);
+			printf("    \"ts\": %12.6f\n", (double)sched->cpu_last_switched[cpu] / 1000);
+			printf("}\n");
+
+			first = false;
+		}
+	}
+
+	printf("    ]\n");
+	printf("}\n");
+
+	// print_bad_events(sched);
+	return 0;
+}
+
 static int perf_sched__replay(struct perf_sched *sched)
 {
 	unsigned long i;
@@ -2024,6 +2157,9 @@ int cmd_sched(int argc, const char **argv, const char *prefix __maybe_unused)
 	struct trace_sched_handler map_ops  = {
 		.switch_event	    = map_switch_event,
 	};
+	struct trace_sched_handler chrometracing_ops  = {
+		.switch_event	    = chrometracing_switch_event,
+	};
 	struct trace_sched_handler replay_ops  = {
 		.wakeup_event	    = replay_wakeup_event,
 		.switch_event	    = replay_switch_event,
@@ -2065,6 +2201,15 @@ int cmd_sched(int argc, const char **argv, const char *prefix __maybe_unused)
 		sched.tp_handler = &map_ops;
 		setup_sorting(&sched, latency_options, latency_usage);
 		return perf_sched__map(&sched);
+	} else if (!strcmp(argv[0], "chrometracing")) {
+		if (argc) {
+			argc = parse_options(argc, argv, map_options, map_usage, 0);
+			if (argc)
+				usage_with_options(map_usage, map_options);
+		}
+		sched.tp_handler = &chrometracing_ops;
+		setup_sorting(&sched, latency_options, latency_usage);
+		return perf_sched__chrometracing(&sched);
 	} else if (!strncmp(argv[0], "rep", 3)) {
 		sched.tp_handler = &replay_ops;
 		if (argc) {
