@@ -1,0 +1,26 @@
+From 779ab79cf8054cb76fd511f19cc73e68bb1eda03 Mon Sep 17 00:00:00 2001
+From: Richard Gale <richard.gale@sonos.com>
+Date: Fri, 21 Jan 2022 13:26:12 +0000
+Subject: [PATCH] Use cwd for build_path
+
+---
+ source/common/process.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/source/common/process.c b/source/common/process.c
+index 241eba5..0b14423 100644
+--- a/source/common/process.c
++++ b/source/common/process.c
+@@ -12,6 +12,9 @@
+ #define BUILD_PATH "/build/source\0"
+ 
+ char *find_build_path() {
++	char *cwdpath = (char *)malloc(1024);
++	return getcwd(cwdpath, 1024);
++
+ 	char *path = (char *)malloc(strlen(__FILE__) + strlen(BUILD_PATH));
+ 	char *right;
+ 	char *left;
+-- 
+2.26.2
+
