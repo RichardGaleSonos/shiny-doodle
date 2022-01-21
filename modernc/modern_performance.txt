@@ -1,0 +1,96 @@
+Installed latest LLVM
+
+add-apt-repository "deb http://apt.llvm.org/hirsute/ llvm-toolchain-hirsute-13 main"
+add-apt-repository "deb-src http://apt.llvm.org/hirsute/ llvm-toolchain-hirsute-13 main"
+apt-get install clang-format clang-tidy clang-tools clang clangd libc++-dev libc++1 libc++abi-dev libc++abi1 libclang-dev libclang1 liblldb-dev libllvm-ocaml-dev libomp-dev libomp5 lld lldb llvm-dev llvm-runtime llvm python-clang 
+
+## override
+
+#include <iostream> // ADDED:REG
+
+class Base
+{
+	public:
+		void sayHi() // build error! forgot to make "sayHi" virtual
+		{
+			std::cout << "Base says hi\n";
+		}
+};
+
+class Derived : public Base
+{
+	public:
+		virtual void sayHi()
+		{
+			std::cout << "Derived says hi\n";
+		}
+};
+
+void sayHi(Base& b)
+{
+	b.sayHi();
+}
+
+int main()
+{
+	Derived d;
+	sayHi(d);
+}
+
+// Output: none -- doesn't compile
+
+Best clang 13 could offer is:
+
+clang++ -Wall -Wextra -Wpedantic -Weverything -c override_bug.cpp
+override_bug.cpp:12:7: warning: 'Derived' has virtual functions but non-virtual destructor [-Wnon-virtual-dtor]
+class Derived : public Base
+      ^
+override_bug.cpp:21:6: warning: no previous prototype for function 'sayHi' [-Wmissing-prototypes]
+void sayHi(Base& b)
+     ^
+override_bug.cpp:21:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+void sayHi(Base& b)
+^
+static 
+override_bug.cpp:12:7: warning: 'Derived' has no out-of-line virtual method definitions; its vtable will be emitted in every translation unit [-Wweak-vtables]
+class Derived : public Base
+      ^
+3 warnings generated.
+
+clang-tidy would be amazing.
+
+
+## constexpr
+
+#define, const and constexpr all yield the same assembly
+
+0000000000000000 <main>:
+       0: 55                           	pushq	%rbp
+       1: 48 89 e5                     	movq	%rsp, %rbp
+       4: c7 45 fc 00 00 00 00         	movl	$0, -4(%rbp)
+       b: 31 c0                        	xorl	%eax, %eax
+       d: 5d                           	popq	%rbp
+       e: c3                           	retq
+
+use constrexpr if supported, then const for type safety, then #define
+
+TODO: check other compilers
+
+
+## containers
+
+The generated code for C and std::array code for manipulating the code is the same.
+
+However it's worth noting two things:
+
+1) With std::array you're more likely to use std::iosteam. std::ostream vs printf() is way more code.
+
+2) Similarly with compilation time, including <iostream> is 200ms vs 4ms for stdio.h, and including <array> is 4ms vs 0ms.
+
+
+Further results
+
+heaptrack
+
+sizer
+
