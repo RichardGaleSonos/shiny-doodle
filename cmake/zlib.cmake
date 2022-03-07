@@ -21,7 +21,12 @@ if (NOT ZLIB_FOUND)
         URL_HASH
             SHA256=c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1
         CONFIGURE_COMMAND
-            prefix=${PREFIX} CROSS_PREFIX=${TRIPLE}- CFLAGS=${EXTRA_CFLAGS} LDFLAGS=${EXTRA_LDFLAGS} ${CMAKE_BINARY_DIR}/zlib-prefix/src/zlib/configure
+            prefix=${PREFIX}
+            CROSS_PREFIX=${TRIPLE}-
+            CFLAGS=${EXTRA_CFLAGS}
+            LDFLAGS=${EXTRA_LDFLAGS}
+            ${CMAKE_BINARY_DIR}/zlib-prefix/src/zlib/configure
+
         BUILD_COMMAND
             make
         INSTALL_COMMAND

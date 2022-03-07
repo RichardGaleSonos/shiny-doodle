@@ -1,10 +1,10 @@
 # TODO:REG add qa checks from insane.bbclass
 
 set(CMAKE_SYSTEM_NAME Linux)
-set(CMAKE_SYSTEM_PROCESSOR powerpc)
+set(CMAKE_SYSTEM_PROCESSOR arm)
 
-set(TRIPLE "powerpc-fenwayV3-linux-gnu")
-set(TRIPLE_UNKNOWN "powerpc-unknown-linux-gnueabi")
+set(TRIPLE "arm-ca9v3-linux-gnueabihf")
+set(TRIPLE_UNKNOWN "arm-unknown-linux-gnueabihf")
 
 set(CMAKE_SYSROOT /usr/local/toolchain/${TRIPLE}/${TRIPLE}/sysroot)
 

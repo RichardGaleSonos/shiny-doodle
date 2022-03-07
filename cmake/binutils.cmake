@@ -24,8 +24,9 @@ if(NOT BINUTILS_FOUND)
                 --prefix=${PREFIX}
                 --host=${TRIPLE}
                 --without-x
-                --disable-shared
-                --enable-static
+                --enable-shared
+                --disable-static
+
                 --disable-share
                 --disable-info
                 --disable-infodir

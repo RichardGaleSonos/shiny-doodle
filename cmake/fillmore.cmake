@@ -3,8 +3,8 @@
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR powerpc)
 
-set(TRIPLE "powerpc-fenwayV3-linux-gnu")
-set(TRIPLE_UNKNOWN "powerpc-unknown-linux-gnueabi")
+set(TRIPLE "mips-fillmore_mplt_v2-linux-gnu")
+set(TRIPLE_UNKNOWN "mips-fillmore_mplt_v2-linux-gnu")
 
 set(CMAKE_SYSROOT /usr/local/toolchain/${TRIPLE}/${TRIPLE}/sysroot)
 
